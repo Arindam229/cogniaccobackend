@@ -1,0 +1,23 @@
+[
+  {
+    "email": "nikhil_s@es.iitr.ac.in",
+    "name": "nikhil",
+    "phoneNumber": 9140243133,
+    "collegeName": "IITR",
+    "uniqueID": "USER-1767890586811-913"
+  },
+  {
+    "email": "kartik_a@ph.iitr.ac.in",
+    "name": "kartik",
+    "phoneNumber": 9837460533,
+    "collegeName": "IITR",
+    "uniqueID": "USER-1767890590506-172"
+  },
+  {
+    "email": "agarwalkartik2018@gmail.com",
+    "name": "kartik",
+    "phoneNumber": 9837460533,
+    "collegeName": "IITR",
+    "uniqueID": "USER-1767890594938-248"
+  }
+]
