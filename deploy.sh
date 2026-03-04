@@ -15,6 +15,7 @@ git reset --hard origin/main
 
 # 2. Install production dependencies
 echo "📦 Installing Node dependencies..."
+nvm deactivate
 npm install --production
 
 # 3. Restart PM2 process
