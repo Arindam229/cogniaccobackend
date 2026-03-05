@@ -8,6 +8,7 @@ const verifiedParticipantSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
   phoneNumber: { type: String },
+  gender: { type: String, enum: ['male', 'female', 'other'], default: 'male' },
   collegeName: { type: String },
   accommodation: {
     allocated: { type: Boolean, default: false },
@@ -30,32 +31,32 @@ const Participant = mongoose.model('Participant');
 router.post('/scan', async (req, res) => {
   try {
     const { uniqueID } = req.body;
-    
+
     if (!uniqueID) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'QR code data is required' 
+      return res.status(400).json({
+        success: false,
+        message: 'QR code data is required'
       });
     }
 
     // STEP 1: Find in Participants collection
     const participant = await Participant.findOne({ uniqueID });
-    
+
     if (!participant) {
-      return res.status(404).json({ 
-        success: false, 
-        message: '❌ Participant not found!' 
+      return res.status(404).json({
+        success: false,
+        message: '❌ Participant not found!'
       });
     }
     // STEP 2: Check if already verified
     const alreadyVerified = await VerifiedParticipant.findOne({ uniqueID });
-    
+
     if (alreadyVerified) {
       // Update existing record with latest accommodation info
       alreadyVerified.accommodation = participant.accommodation || { allocated: false };
       alreadyVerified.lastUpdated = new Date();
       await alreadyVerified.save();
-      
+
       return res.json({
         success: true,
         message: '⚠️ Already Entered!',
@@ -97,13 +98,13 @@ router.post('/scan', async (req, res) => {
         accommodation: participant.accommodation || { allocated: false }
       }
     });
-    
+
   } catch (error) {
     console.error('Scan error:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: 'Server error during scan',
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -112,7 +113,7 @@ router.post('/scan', async (req, res) => {
 router.get('/verified', async (req, res) => {
   try {
     const verified = await VerifiedParticipant.find().sort({ verifiedAt: -1 });
-    
+
     // Sync with current Participant data
     for (const v of verified) {
       const current = await Participant.findOne({ uniqueID: v.uniqueID });
@@ -121,7 +122,7 @@ router.get('/verified', async (req, res) => {
         await v.save();
       }
     }
-    
+
     res.json({
       success: true,
       total: verified.length,
@@ -137,7 +138,7 @@ router.post('/sync-verified', async (req, res) => {
   try {
     const verified = await VerifiedParticipant.find();
     let updated = 0;
-    
+
     for (const v of verified) {
       const participant = await Participant.findOne({ uniqueID: v.uniqueID });
       if (participant) {
@@ -147,7 +148,7 @@ router.post('/sync-verified', async (req, res) => {
         updated++;
       }
     }
-    
+
     res.json({
       success: true,
       message: `Synced ${updated} verified participants`,

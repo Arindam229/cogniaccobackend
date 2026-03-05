@@ -57,17 +57,17 @@ const sendEmail = async (to, name, phoneNumber, collegeName, uniqueId) => {
 
     // ===== HEADER SECTION WITH GRADIENT EFFECT =====
     const headerHeight = 60;
-    
+
     // Draw gradient-like header with blue shades
     idCardDoc.rect(idCardX, idCardY, idCardWidth, headerHeight)
       .fillAndStroke('#0066CC', '#0066CC');
-    
+
     // Logo in header (left side)
-    const logoPath = "./uploads/cogni.jpg";
+    const logoPath = "./src/cogni.jpg";
     const logoSize = 45;
-    idCardDoc.image(logoPath, idCardX + 10, idCardY + 7.5, { 
+    idCardDoc.image(logoPath, idCardX + 10, idCardY + 7.5, {
       width: logoSize,
-      height: logoSize 
+      height: logoSize
     });
 
     // Event title in header
@@ -78,7 +78,7 @@ const sendEmail = async (to, name, phoneNumber, collegeName, uniqueId) => {
         width: idCardWidth - logoSize - 40,
         align: "left"
       });
-    
+
     idCardDoc.font("Helvetica")
       .fontSize(10)
       .fillColor('#FFFFFF')
@@ -98,13 +98,13 @@ const sendEmail = async (to, name, phoneNumber, collegeName, uniqueId) => {
     const photoX = idCardX + 15;
     const photoY = idCardY + headerHeight + 15;
     const photoSize = 85;
-    
+
     // Photo frame - plain simple border
     idCardDoc.roundedRect(photoX, photoY, photoSize, photoSize, 3)
       .strokeColor('#CCCCCC')
       .lineWidth(1)
       .stroke();
-    
+
     idCardDoc.fontSize(9)
       .fillColor('#666666')
       .text("PHOTO", photoX + 22, photoY + 37);
@@ -121,7 +121,7 @@ const sendEmail = async (to, name, phoneNumber, collegeName, uniqueId) => {
       .fontSize(9)
       .fillColor('#0066CC')
       .text("Name:", detailsX, detailsY);
-    
+
     idCardDoc.font("Helvetica")
       .fontSize(9)
       .fillColor('#000000')
@@ -135,7 +135,7 @@ const sendEmail = async (to, name, phoneNumber, collegeName, uniqueId) => {
       .fontSize(9)
       .fillColor('#0066CC')
       .text("Contact:", detailsX, detailsY + 30);
-    
+
     idCardDoc.font("Helvetica")
       .fontSize(9)
       .fillColor('#000000')
@@ -146,7 +146,7 @@ const sendEmail = async (to, name, phoneNumber, collegeName, uniqueId) => {
       .fontSize(9)
       .fillColor('#0066CC')
       .text("College:", detailsX, detailsY + 60);
-    
+
     idCardDoc.font("Helvetica")
       .fontSize(9)
       .fillColor('#000000')
@@ -161,25 +161,25 @@ const sendEmail = async (to, name, phoneNumber, collegeName, uniqueId) => {
     const qrX = idCardX + 15;
 
     // QR code without border - plain
-    idCardDoc.image(qrCodeData, qrX, qrY, { 
+    idCardDoc.image(qrCodeData, qrX, qrY, {
       width: qrSize,
-      height: qrSize 
+      height: qrSize
     });
 
     // ===== ACCOMMODATION SECTION =====
     const accomX = idCardX + idCardWidth - 120;
     const accomY = idCardY + idCardHeight - 35;
-    
+
     idCardDoc.font("Helvetica-Bold")
       .fontSize(9)
       .fillColor('#0066CC')
       .text("Accommodation:", accomX, accomY);
-    
+
     // Checkbox for accommodation
     idCardDoc.roundedRect(accomX, accomY + 15, 10, 10, 2)
       .strokeColor('#0066CC')
       .stroke();
-    
+
     idCardDoc.font("Helvetica")
       .fontSize(9)
       .fillColor('#000000')
@@ -199,7 +199,7 @@ const sendEmail = async (to, name, phoneNumber, collegeName, uniqueId) => {
       .fontSize(14)
       .fillColor('#0066CC')
       .text("Important Instructions", instructionX, instructionY);
-    
+
     idCardDoc.moveTo(instructionX, instructionY + 18)
       .lineTo(instructionX + 180, instructionY + 18)
       .strokeColor('#FFD700')

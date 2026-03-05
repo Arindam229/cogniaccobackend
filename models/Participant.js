@@ -35,6 +35,7 @@ const participantSchema = new mongoose.Schema({
   email: { type: String, required: true },
   name: { type: String, required: true },
   phoneNumber: { type: String, required: true },
+  gender: { type: String, enum: ['male', 'female', 'other'], default: 'male' },
   collegeName: { type: String },
   groupId: { type: String }, // For group allocation
   accommodation: {

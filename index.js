@@ -67,7 +67,7 @@ const createCustomMailTransporter = () => {
 const sendCustomEmail = async (to, name, subject, body) => {
   try {
     const transporter = createCustomMailTransporter();
-    
+
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: to,
@@ -162,7 +162,7 @@ const sendCustomEmail = async (to, name, subject, body) => {
 </html>
       `,
     });
-    
+
     console.log(`✅ Custom email sent to ${to}`);
     return { success: true };
   } catch (error) {
@@ -175,14 +175,14 @@ const sendCustomEmail = async (to, name, subject, body) => {
 app.post("/api/custom-mail/send-bulk", async (req, res) => {
   try {
     const { recipients, subject, body } = req.body;
-    
+
     if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
       return res.status(400).json({
         success: false,
         error: 'Recipients array is required'
       });
     }
-    
+
     if (!subject || !body) {
       return res.status(400).json({
         success: false,
@@ -197,7 +197,7 @@ app.post("/api/custom-mail/send-bulk", async (req, res) => {
     // Send emails with delay to avoid rate limiting
     for (let i = 0; i < recipients.length; i++) {
       const recipient = recipients[i];
-      
+
       try {
         // Add delay between emails (1 second)
         if (i > 0) {
@@ -210,14 +210,14 @@ app.post("/api/custom-mail/send-bulk", async (req, res) => {
           subject,
           body
         );
-        
+
         successCount++;
         logs.push({
           email: recipient.email,
           status: 'success',
           timestamp: Date.now()
         });
-        
+
         console.log(`✅ Custom email sent to ${recipient.email} (${i + 1}/${recipients.length})`);
       } catch (error) {
         failureCount++;
@@ -227,7 +227,7 @@ app.post("/api/custom-mail/send-bulk", async (req, res) => {
           error: error.message,
           timestamp: Date.now()
         });
-        
+
         console.error(`❌ Failed to send custom email to ${recipient.email}:`, error.message);
       }
     }
@@ -251,14 +251,14 @@ app.post("/api/custom-mail/send-bulk", async (req, res) => {
 app.post("/api/custom-mail/send-excel", upload.single("excelFile"), async (req, res) => {
   try {
     const { subject, body } = req.body;
-    
+
     if (!subject || !body) {
       return res.status(400).json({
         success: false,
         error: 'Subject and body are required'
       });
     }
-    
+
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -269,7 +269,7 @@ app.post("/api/custom-mail/send-excel", upload.single("excelFile"), async (req, 
     const workbook = XLSX.readFile(req.file.path);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const participants = XLSX.utils.sheet_to_json(sheet);
-    
+
     const logs = [];
     let successCount = 0;
     let failureCount = 0;
@@ -278,7 +278,7 @@ app.post("/api/custom-mail/send-excel", upload.single("excelFile"), async (req, 
     for (let i = 0; i < participants.length; i++) {
       const participant = participants[i];
       const { email, name } = participant;
-      
+
       if (!email || !name) {
         logs.push({
           email: email || 'Unknown',
@@ -289,7 +289,7 @@ app.post("/api/custom-mail/send-excel", upload.single("excelFile"), async (req, 
         failureCount++;
         continue;
       }
-      
+
       try {
         // Add delay between emails (1 second)
         if (i > 0) {
@@ -297,14 +297,14 @@ app.post("/api/custom-mail/send-excel", upload.single("excelFile"), async (req, 
         }
 
         await sendCustomEmail(email, name, subject, body);
-        
+
         successCount++;
         logs.push({
           email: email,
           status: 'success',
           timestamp: Date.now()
         });
-        
+
         console.log(`✅ Custom email sent to ${email} (${i + 1}/${participants.length})`);
       } catch (error) {
         failureCount++;
@@ -314,7 +314,7 @@ app.post("/api/custom-mail/send-excel", upload.single("excelFile"), async (req, 
           error: error.message,
           timestamp: Date.now()
         });
-        
+
         console.error(`❌ Failed to send custom email to ${email}:`, error.message);
       }
     }
@@ -331,12 +331,12 @@ app.post("/api/custom-mail/send-excel", upload.single("excelFile"), async (req, 
     });
   } catch (error) {
     console.error("Error in Excel custom mail:", error);
-    
+
     // Clean up file if it exists
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
-    
+
     res.status(500).json({
       success: false,
       error: error.message
@@ -358,7 +358,7 @@ app.post("/upload-excel", upload.single("excelFile"), async (req, res) => {
     // Process emails with delay to avoid rate limiting
     for (let i = 0; i < participants.length; i++) {
       const participant = participants[i];
-      const { email, name, phoneNumber, collegeName } = participant;
+      const { email, name, phoneNumber, collegeName, gender } = participant;
       const uniqueID = `USER-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
       try {
         // Add delay between emails (1 second)
@@ -367,12 +367,19 @@ app.post("/upload-excel", upload.single("excelFile"), async (req, res) => {
         }
 
         await sendEmail(email, name, phoneNumber, collegeName, uniqueID);
-        participantData.push({ email, name, phoneNumber, collegeName, uniqueID });
-        
+        participantData.push({ email, name, phoneNumber, collegeName, gender: gender || 'male', uniqueID });
+
         // Save to MongoDB
-        await Participant.create({ email, name, phoneNumber, collegeName, uniqueID });
+        await Participant.create({
+          email,
+          name,
+          phoneNumber,
+          collegeName,
+          gender: gender ? gender.toLowerCase() : 'male',
+          uniqueID
+        });
         successCount++;
-        
+
         // Log success
         logs.push({
           email: email, // ACTUAL EMAIL ADDRESS
@@ -380,7 +387,7 @@ app.post("/upload-excel", upload.single("excelFile"), async (req, res) => {
           timestamp: Date.now(),
           uniqueId: uniqueID // Optional: QR code ID
         });
-        
+
         console.log(`✅ Email sent to ${email} (${i + 1}/${participants.length})`);
       } catch (error) {
         // Log failure with error message
@@ -391,14 +398,14 @@ app.post("/upload-excel", upload.single("excelFile"), async (req, res) => {
           timestamp: Date.now()
         });
         failureCount++;
-        
+
         console.error(`❌ Failed to send email to ${email}:`, error.message);
       }
     }
 
     // Save to filesystem
     fs.writeFileSync("uploads/allparticipants.json", JSON.stringify(participantData, null, 2));
-    
+
     fs.unlinkSync(req.file.path);
 
     // Return response with logs
@@ -491,7 +498,7 @@ app.get('/api/admin/scanned', async (req, res) => {
 app.post('/api/email-config', (req, res) => {
   try {
     const { email, password } = req.body;
-    
+
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
     }
@@ -522,9 +529,9 @@ app.post('/api/email-config', (req, res) => {
     process.env.EMAIL_USER = email;
     process.env.EMAIL_PASS = password;
 
-    res.json({ 
-      success: true, 
-      message: 'Email configuration updated successfully' 
+    res.json({
+      success: true,
+      message: 'Email configuration updated successfully'
     });
   } catch (error) {
     console.error('Error updating email config:', error);
