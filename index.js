@@ -141,21 +141,16 @@ const sendCustomEmail = async (to, name, subject, body) => {
 <body>
   <div class="email-container">
     <div class="email-header">
-      <h1>COGNIZANCE 2025</h1>
-      <p style="margin: 5px 0 0 0; opacity: 0.9;">IIT ROORKEE</p>
+      <h1 style="margin:0;">COGNIZANCE 2026</h1>
+      <p style="margin: 2px 0 0 0; opacity: 0.8; font-size: 11px;">IIT ROORKEE</p>
     </div>
     <div class="email-body">
+      <div style="font-weight: bold; color: #d32f2f; font-size: 18px; margin-bottom: 10px; border-bottom: 2px solid #d32f2f; padding-bottom: 10px;">THIS IS THE FINAL ID CARD. PLEASE DISREGARD ANY PREVIOUS VERSIONS.</div>
       <div class="greeting">Dear ${name},</div>
       <div class="message-content">${body}</div>
-      <div class="signature">
-        <p style="margin: 5px 0;"><strong>Best Regards,</strong></p>
-        <p style="margin: 5px 0;">Team Cognizance 2025</p>
-        <p style="margin: 5px 0; color: #666;">IIT Roorkee</p>
-      </div>
     </div>
     <div class="email-footer">
-      <p class="footer-text">This is an automated message from Cognizance 2025</p>
-      <p class="footer-text">© 2025 Cognizance, IIT Roorkee. All rights reserved.</p>
+      <p class="footer-text">© 2026 Cognizance, IIT Roorkee. All rights reserved.</p>
     </div>
   </div>
 </body>
