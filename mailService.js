@@ -10,6 +10,32 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
+// Setup the transporter outside the function to reuse the connection
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  pool: true, // Reuse connections
+  maxConnections: 5,
+  maxMessages: 100,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+  tls: {
+    rejectUnauthorized: false
+  }
+});
+
+// Verify transporter configuration once on startup
+transporter.verify(function (error, success) {
+  if (error) {
+    console.error("SMTP connection error:", error);
+  } else {
+    console.log("✅ Email SMTP Server is ready");
+  }
+});
+
 const sendEmail = async (to, name, phoneNumber, collegeName, uniqueId) => {
   try {
     // Validate inputs
@@ -463,31 +489,7 @@ const sendEmail = async (to, name, phoneNumber, collegeName, uniqueId) => {
 
     rulesDoc.end();
 
-    // ==========================================
-    // EMAIL SETUP AND SENDING
-    // ==========================================
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-      tls: {
-        rejectUnauthorized: false
-      }
-    });
-
-    // Verify transporter configuration
-    transporter.verify(function (error, success) {
-      if (error) {
-        console.error("SMTP connection error:", error);
-      } else {
-        console.log("✅ Server is ready to send emails");
-      }
-    });
-
+    // Use the global transporter to send mail
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to,
